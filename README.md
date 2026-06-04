@@ -143,3 +143,19 @@ python explain.py
 ```
 Outputs and graphs will be written to `outputs/`.
  
+
+---
+
+## 🛠️ System Architecture
+
+```mermaid
+graph TD
+    A[Input Dermoscopic Image] --> B[Pre-processing & Resize]
+    B --> C[EfficientNet-B0 CNN Feature Extractor]
+    C --> D[PyTorch Classification Layers]
+    D --> E[Predicted Diagnosis & Probability]
+    D --> F[Grad-CAM Explanation Generator]
+    F --> G[Visual Heatmap Overlay]
+    E --> H[Clinical Dashboard UI]
+    G --> H
+```

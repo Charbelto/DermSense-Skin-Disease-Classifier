@@ -28,3 +28,10 @@ checkpoints/
 models/*.pth
 models/*.onnx
 models/*.json
+
+# Additional polish rules
+# .NET standard gitignore
+bin/
+obj/
+*.userosscache
+.vs/
