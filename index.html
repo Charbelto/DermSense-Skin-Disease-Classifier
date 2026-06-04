@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DermSense AI | Advanced Skin Analytics</title>
+    <meta name="description" content="State-of-the-art dermatological analysis powered by deep learning. Classify skin lesions with high precision.">
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- TensorFlow.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo">
+            <i data-lucide="shield-check"></i>
+            <span>Derm<span>Sense</span></span>
+        </div>
+        <ul class="nav-links">
+            <li class="nav-item active" data-section="analysis">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Analysis</span>
+            </li>
+            <li class="nav-item" data-section="history">
+                <i data-lucide="history"></i>
+                <span>Scan History</span>
+            </li>
+            <li class="nav-item" data-section="reports">
+                <i data-lucide="file-text"></i>
+                <span>Reports</span>
+            </li>
+            <li class="nav-item" data-section="settings">
+                <i data-lucide="settings"></i>
+                <span>Settings</span>
+            </li>
+        </ul>
+    </aside>
+
+    <main class="main-stage">
+        <div class="hero-bg"></div>
+        
+        <!-- Analysis Section (Default) -->
+        <div id="section-analysis" class="content-section active">
+            <header class="fade-in">
+                <h1>Dermoscopic Analysis</h1>
+                <p class="subtitle">Upload a high-resolution dermoscopic image to begin automated triage.</p>
+            </header>
+
+            <section class="upload-container fade-in" id="drop-zone" style="animation-delay: 0.1s;">
+                <div class="scanner-line" id="scanner"></div>
+                
+                <div id="upload-prompt">
+                    <i data-lucide="upload-cloud" class="upload-icon"></i>
+                    <div class="upload-text">
+                        Drag and drop image here <br>
+                        or <span>browse files</span>
+                    </div>
+                    <input type="file" id="file-input" hidden accept="image/*">
+                </div>
+
+                <div id="preview-container">
+                    <img id="preview-img" src="" alt="Skin Lesion Preview">
+                </div>
+            </section>
+
+            <div id="status-text" class="fade-in" style="margin-top: 2rem; color: var(--accent); font-weight: 600; display: none;">
+                <span id="model-status">Initializing AI Engine...</span>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div id="section-history" class="content-section">
+            <header>
+                <h1>Scan History</h1>
+                <p class="subtitle">Review your previous dermatological analyses.</p>
+            </header>
+            <div class="history-list" id="history-list">
+                <!-- History items injected here -->
+            </div>
+        </div>
+
+        <!-- Reports Section -->
+        <div id="section-reports" class="content-section">
+            <header>
+                <h1>Clinical Reports</h1>
+                <p class="subtitle">Manage and download your generated clinical reports.</p>
+            </header>
+            <div class="reports-grid" id="reports-grid">
+                <!-- Report cards injected here -->
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div id="section-settings" class="content-section">
+            <header>
+                <h1>System Settings</h1>
+                <p class="subtitle">Configure AI model sensitivity and notification preferences.</p>
+            </header>
+            <div class="settings-card">
+                <div class="setting-item">
+                    <div>
+                        <h3>Model Sensitivity</h3>
+                        <p>Adjust the threshold for high-risk detection.</p>
+                    </div>
+                    <input type="range" min="0" max="100" value="75">
+                </div>
+                <div class="setting-item">
+                    <div>
+                        <h3>Cloud Sync</h3>
+                        <p>Automatically backup reports to secure medical storage.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <div>
+                        <h3>Dark Mode</h3>
+                        <p>Toggle between Midnight Medical and Clinical Light themes.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Overlay -->
+        <div class="results-overlay" id="results-overlay">
+            <div class="results-card">
+                <div class="close-results" id="close-btn">
+                    <i data-lucide="x"></i>
+                </div>
+                
+                <div class="result-image-panel">
+                    <img id="analyzed-img" src="" alt="Analyzed Lesion">
+                </div>
+
+                <div class="diagnostics-panel">
+                    <div id="risk-level" class="risk-indicator">
+                        <i data-lucide="alert-triangle"></i>
+                        <span>High Risk Detected</span>
+                    </div>
+                    
+                    <h2 id="main-diagnosis" style="font-size: 2rem; margin-bottom: 0.5rem;">Melanoma</h2>
+                    <p style="color: var(--text-dim); margin-bottom: 2rem;">Confidence Score: <span id="conf-score" style="color: var(--accent);">94.2%</span></p>
+
+                    <div class="probability-list" id="prob-list">
+                        <!-- Items will be injected by JS -->
+                    </div>
+
+                    <p class="disclaimer">
+                        <b>Important:</b> This is an AI-assisted screening tool. Results are not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider.
+                    </p>
+
+                    <button class="nav-item" style="background: var(--accent); color: var(--primary-bg); font-weight: 700; margin-top: 2rem; border: none; width: 100%; justify-content: center;">
+                        Download Full Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="mobile-nav">
+        <div class="nav-item active" data-section="analysis">
+            <i data-lucide="layout-dashboard"></i>
+        </div>
+        <div class="nav-item" data-section="history">
+            <i data-lucide="history"></i>
+        </div>
+        <div class="nav-item" data-section="reports">
+            <i data-lucide="file-text"></i>
+        </div>
+        <div class="nav-item" data-section="settings">
+            <i data-lucide="settings"></i>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

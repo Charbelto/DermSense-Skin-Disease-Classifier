@@ -1,0 +1,85 @@
+Skin Lesion Classification Using Deep Learning (HAM10000)
+Critical Reflection Report (Individual Assessment)
+
+1. Introduction and Problem Context
+This project addresses automated dermoscopic skin-lesion classification using the HAM10000 dataset. The practical motivation is to support earlier risk triage in dermatology workflows while maintaining clinician oversight. The implemented solution is a deep-learning image classifier (EfficientNet-B0 transfer learning), benchmarked against a traditional machine learning baseline (SVM with HOG plus color histogram features).
+
+2. Dataset and Reproducibility
+The dataset is fetched programmatically from public sources (Harvard Dataverse endpoints, with Kaggle fallback) and processed into class-folder structure for reproducible loading with ImageFolder. The notebook includes setup and dependency cells intended for end-to-end Run All execution.
+
+The data is strongly imbalanced, with melanocytic nevi (nv) dominating the sample distribution and minority classes (for example df and vasc) having comparatively few samples. This imbalance influences metric interpretation and makes macro-level metrics critical for fair evaluation.
+
+3. LO1: Traditional ML versus Deep Learning
+3.1 Baseline design
+The SVM baseline uses hand-crafted visual descriptors:
+- Color histograms (global channel distributions)
+- HOG features (local gradient orientation patterns)
+
+3.2 Deep model design
+The deep model uses EfficientNet-B0 pretrained on ImageNet, with a replaced classifier head for 7-class prediction. Training uses two phases:
+- Phase 1: frozen backbone, train classifier head
+- Phase 2: unfreeze and fine-tune at a lower learning rate
+
+3.3 Comparative findings and interpretation
+In the saved reproducibility-profile run:
+- SVM showed slightly higher overall accuracy.
+- EfficientNet showed much stronger macro-F1 and minority-class recall.
+
+This is a meaningful result: overall accuracy can be dominated by the largest class, whereas macro-F1 and minority-class recall better capture model usefulness on clinically important but underrepresented classes. Therefore, the deep model is better aligned with risk-sensitive medical screening priorities despite a small accuracy tradeoff in this constrained run.
+
+3.4 Why deep learning remains justified
+Skin-lesion diagnosis depends on subtle, spatially localized texture and morphology cues that vary across classes and acquisition conditions. Fixed hand-crafted descriptors often under-represent these patterns, while deep convolutional features can learn richer hierarchical representations directly from data.
+
+4. LO2: Critical Evaluation of Solution and Implications
+4.1 Technical evaluation
+The notebook includes:
+- Classification reports
+- Confusion matrices
+- ROC/AUC plots
+- Class-wise SVM versus EfficientNet metric comparisons
+- Misclassification analysis
+
+These outputs support nuanced conclusions rather than single-metric reporting.
+
+4.2 Interpretability
+Grad-CAM is used to visualize regions influencing predictions. This improves transparency for human review. However, Grad-CAM is qualitative and should not be treated as causal proof; it is best used alongside quantitative validation and domain-expert review.
+
+4.3 Ethical, social, and organizational implications
+- Clinical safety: outputs should remain decision support, not automated diagnosis.
+- Fairness: class and potential demographic imbalance can reduce generalization and increase risk for underrepresented groups.
+- Privacy and governance: medical-image handling requires strict data protection practices.
+- Deployment: model confidence and calibration must be considered before workflow integration.
+
+5. Fit Diagnosis: Overfitting and Underfitting
+The saved run does not show a strong overfitting signal because train, validation, and test performance are relatively close. Mild underfitting is plausible because reproducibility mode intentionally limits epochs to keep runtime practical. This constraint likely suppresses peak achievable performance.
+
+6. Limitations
+- Dataset imbalance and limited representativeness.
+- Potential domain shift across devices, populations, and clinics.
+- Some visually similar lesion classes remain difficult.
+- Interpretability is partial and should be triangulated with additional methods.
+
+7. LO3: Emerging Trends and Future Development
+Promising extensions include:
+- Vision Transformer and hybrid CNN-transformer architectures
+- Self-supervised pretraining on larger unlabelled dermoscopy corpora
+- Federated learning for privacy-preserving multi-site training
+- Multimodal fusion of image and metadata
+- Edge-oriented compression (quantization/distillation) for low-resource deployment
+
+8. Targeted Improvement Plan
+1. Run a full training profile and report side-by-side with reproducibility-profile metrics.
+2. Add stratified k-fold evaluation for lower split variance.
+3. Add probability calibration and threshold analysis for risk-sensitive deployment.
+4. Evaluate external datasets for generalization and fairness diagnostics.
+5. Add complementary explainability techniques beyond Grad-CAM.
+
+9. Conclusion
+The implemented project is technically coherent and appropriately scoped for the assessment. While reproducibility-profile constraints limit peak performance, the deep-learning model demonstrates stronger class-balanced behavior than the traditional baseline and offers a more suitable foundation for future clinical decision-support refinement.
+
+10. References
+- Tschandl, P., Rosendahl, C., and Kittler, H. (2018). Scientific Data 5, 180161.
+- Tan, M., and Le, Q. (2019). EfficientNet.
+- Cortes, C., and Vapnik, V. (1995). Support-vector networks.
+- Dalal, N., and Triggs, B. (2005). HOG.
+- Selvaraju, R. R., et al. (2017). Grad-CAM.

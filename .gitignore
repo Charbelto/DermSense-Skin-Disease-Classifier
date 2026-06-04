@@ -1,0 +1,30 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv
+venv
+env/
+ENV/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# IDE files
+.idea/
+.vscode/
+*.suo
+*.user
+*.sln
+*.sw?
+
+# Project specific datasets & checkpoints
+ham10000_data/
+*.zip
+*.tar.gz
+checkpoints/
+models/*.pth
+models/*.onnx
+models/*.json
